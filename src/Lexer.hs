@@ -46,7 +46,7 @@ consumeNum s = AInt . read <$> takeNum s ""
 
 
 tokenize :: String -> [Atom] -> ParserResult [Atom]
-tokenize []        atoms = Success "" atoms
-tokenize s@(x : _) atoms = if isDigit x
-    then (\atom -> atoms ++ [atom]) <$> consumeNum s
-    else Success "" atoms
+tokenize [] atoms = Success "" atoms
+tokenize s@(x : _) atoms
+    | isDigit x = (\atom -> atoms ++ [atom]) <$> consumeNum s
+    | otherwise = Success "" atoms
