@@ -2,6 +2,7 @@ module Lexer
     ( tokenize
     , Token(..)
     , Atom(..)
+    , ParserResult(..)
     )
 where
 
@@ -35,14 +36,13 @@ data Token = Token {
 
 data Atom = AInt Int | ABool Bool | AOp String deriving Show
 
-takeNum :: String -> Int -> Int -> ParserResult Int
-takeNum [] num _ = Success [] num
-takeNum s@(x : xs) num cntr
-    | isDigit x = takeNum xs (digitToInt x * cntr + num) (cntr * 10)
-    | otherwise = Success s num
+takeNum :: String -> String -> ParserResult String
+takeNum [] num = Success [] num
+takeNum s@(x : xs) num | isDigit x = takeNum xs $ num ++ [x]
+                       | otherwise = Success s num
 
 consumeNum :: String -> ParserResult Atom
-consumeNum s = AInt <$> takeNum s 0 1
+consumeNum s = AInt . read <$> takeNum s ""
 
 
 tokenize :: String -> [Atom] -> ParserResult [Atom]
